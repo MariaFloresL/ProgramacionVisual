@@ -111,9 +111,18 @@
   }
   .toolbar input{flex:1; min-width:220px;}
   .toolbar input::placeholder{color:var(--ink-dim);}
+  .ctrl-howto{display:flex; flex-wrap:wrap; gap:10px; margin-top:26px;}
+  .ctrl-howto-step{flex:1 1 220px; display:flex; gap:12px; align-items:flex-start; background:var(--bg-card); border:1px solid var(--edge); border-radius:12px; padding:14px 16px;}
+  .ctrl-howto-num{flex:0 0 auto; width:26px; height:26px; border-radius:50%; background:var(--cyan); color:#fff; font-size:12.5px; font-weight:700; display:flex; align-items:center; justify-content:center;}
+  .ctrl-howto-text b{display:block; font-size:13.5px; color:var(--ink); margin-bottom:2px;}
+  .ctrl-howto-text span{font-size:12.5px; color:var(--ink-soft); line-height:1.5;}
+  .toolbar label{display:flex; flex-direction:column; gap:5px; font-size:11.5px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:var(--ink-dim); flex:1; min-width:220px;}
+  .toolbar label.filter-label{flex:0 0 auto; min-width:190px;}
+  .toolbar label input, .toolbar label select{width:100%;}
   .ctrl-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
-  .ctrl-card{background:var(--bg-card); border:1px solid var(--edge); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:10px; transition:border-color .15s ease;}
-  .ctrl-card:hover{border-color:var(--violet);}
+  .ctrl-card{background:var(--bg-card); border:1px solid var(--edge); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:10px; transition:border-color .15s ease, transform .15s ease, box-shadow .15s ease; cursor:pointer; position:relative;}
+  .ctrl-card:hover{border-color:var(--violet); transform:translateY(-2px); box-shadow:0 14px 30px -18px rgba(22,35,63,.35);}
+  .ctrl-card:focus-visible{border-color:var(--cyan);}
   .ctrl-card-head{display:flex; align-items:center; justify-content:space-between;}
   .ctrl-card h4{margin:0; font-size:17px;}
   .ctrl-tag{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--cyan); background:var(--cyan-soft); padding:3px 9px; border-radius:999px;}
@@ -121,9 +130,9 @@
   .chip-row{display:flex; gap:6px; flex-wrap:wrap;}
   .chip{font-size:11px; padding:3px 9px; border-radius:6px; background:rgba(11,61,145,.05); color:var(--ink-soft); border:1px solid var(--edge);}
   .chip.ev{color:var(--magenta); border-color:var(--magenta-soft);}
-  .explore-link{margin-top:4px; font-size:13px; font-weight:600; color:var(--violet); display:inline-flex; align-items:center; gap:5px; background:none; border:none; padding:0; text-align:left;}
-  .explore-link:hover{color:var(--blue-deep);}
+  .explore-link{margin-top:6px; font-size:13.5px; font-weight:700; color:#fff; display:inline-flex; align-items:center; justify-content:center; gap:6px; background:linear-gradient(120deg,var(--cyan),var(--blue-deep)); border:none; padding:10px 14px; border-radius:9px; text-align:center; width:100%; pointer-events:none;}
   .no-results{color:var(--ink-dim); font-size:14px; padding:30px 4px;}
+  .no-results-tip{display:block; margin-top:6px; font-size:12.5px; color:var(--ink-dim);}
 
   /* control detail panel */
   .detail-panel{background:var(--bg-panel); border:1px solid var(--edge); border-radius:16px; padding:30px 32px; margin-top:22px; display:none;}
@@ -329,18 +338,38 @@
       <div class="eyebrow">Cuadro de herramientas</div>
       <h2 class="section-title">Explorador de controles</h2>
       <p class="section-desc">Filtra por nombre, uso o propiedad, y selecciona una tarjeta para abrir el control en grande: cómo usarlo, sus propiedades, eventos y una demo en vivo.</p>
+
+      <div class="ctrl-howto">
+        <div class="ctrl-howto-step">
+          <div class="ctrl-howto-num">1</div>
+          <div class="ctrl-howto-text"><b>Busca o filtra</b><span>Escribe una palabra (ej. "capturar") o elige una categoría en el menú.</span></div>
+        </div>
+        <div class="ctrl-howto-step">
+          <div class="ctrl-howto-num">2</div>
+          <div class="ctrl-howto-text"><b>Elige una tarjeta</b><span>Cada tarjeta es un control. Haz clic en cualquier parte de la tarjeta, o en el botón "Explora este control".</span></div>
+        </div>
+        <div class="ctrl-howto-step">
+          <div class="ctrl-howto-num">3</div>
+          <div class="ctrl-howto-text"><b>Revisa el detalle</b><span>Se abrirá abajo: demo interactiva, propiedades, eventos y código listo para copiar.</span></div>
+        </div>
+      </div>
+
       <div class="toolbar">
-        <input id="ctrl-search" type="text" placeholder="Ejemplo: capturar, Text o Click">
-        <select id="ctrl-filter">
-          <option value="Todos">Categoría: Todos</option>
-          <option value="Contenedor">Contenedor</option>
-          <option value="Entrada">Entrada</option>
-          <option value="Salida">Salida</option>
-          <option value="Acción">Acción</option>
-          <option value="Selección">Selección</option>
-          <option value="Multimedia">Multimedia</option>
-          <option value="Tiempo">Tiempo</option>
-        </select>
+        <label>Buscar por nombre, uso o propiedad
+          <input id="ctrl-search" type="text" placeholder="Ejemplo: capturar, Text o Click">
+        </label>
+        <label class="filter-label">Filtrar por categoría
+          <select id="ctrl-filter">
+            <option value="Todos">Categoría: Todos</option>
+            <option value="Contenedor">Contenedor</option>
+            <option value="Entrada">Entrada</option>
+            <option value="Salida">Salida</option>
+            <option value="Acción">Acción</option>
+            <option value="Selección">Selección</option>
+            <option value="Multimedia">Multimedia</option>
+            <option value="Tiempo">Tiempo</option>
+          </select>
+        </label>
       </div>
       <div class="ctrl-grid" id="ctrl-grid"></div>
       <div class="detail-panel" id="detail-panel"></div>
@@ -687,11 +716,11 @@
 
   function ctrlCardHtml(c){
     var chips = c.chips.map(function(p){ return '<span class="chip">'+p+'</span>'; }).join("");
-    return '<div class="ctrl-card">' +
+    return '<div class="ctrl-card" data-open="'+c.id+'" tabindex="0" role="button" aria-label="Explorar el control '+c.title+'">' +
       '<div class="ctrl-card-head"><h4>'+c.title+'</h4><span class="ctrl-tag">'+c.tag+'</span></div>' +
       '<p>'+c.blurb+'</p>' +
       '<div class="chip-row">'+chips+'<span class="chip ev">⚡ '+c.ev+'</span></div>' +
-      '<button class="explore-link" data-open="'+c.id+'">✦ Explora este control</button>' +
+      '<button class="explore-link" tabindex="-1">✦ Explora este control</button>' +
     '</div>';
   }
 
@@ -705,9 +734,13 @@
       var matchesQ = q === "" || haystack.indexOf(q) !== -1;
       return matchesCat && matchesQ;
     });
-    grid.innerHTML = filtered.length ? filtered.map(ctrlCardHtml).join("") : '<div class="no-results">No hay controles que coincidan con tu búsqueda.</div>';
-    Array.prototype.forEach.call(grid.querySelectorAll("[data-open]"), function(btn){
-      btn.addEventListener("click", function(){ openDetail(btn.getAttribute("data-open")); });
+    grid.innerHTML = filtered.length ? filtered.map(ctrlCardHtml).join("") :
+      '<div class="no-results">No hay controles que coincidan con tu búsqueda.<span class="no-results-tip">Prueba con otra palabra o cambia la categoría a "Todos".</span></div>';
+    Array.prototype.forEach.call(grid.querySelectorAll("[data-open]"), function(card){
+      card.addEventListener("click", function(){ openDetail(card.getAttribute("data-open")); });
+      card.addEventListener("keydown", function(e){
+        if(e.key === "Enter" || e.key === " "){ e.preventDefault(); openDetail(card.getAttribute("data-open")); }
+      });
     });
   }
   document.getElementById("ctrl-search").addEventListener("input", renderGrid);
@@ -817,3 +850,4 @@
 </script>
 </body>
 </html>
+
