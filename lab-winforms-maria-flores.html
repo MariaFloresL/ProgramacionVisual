@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dra. María Flores — Laboratorio de C# · Windows Forms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: light;
+    --bg:#F5F7FB; --bg-panel:#FFFFFF; --bg-card:#FFFFFF; --edge:#DCE3F0;
+    --ink:#16233F; --ink-soft:#55628A; --ink-dim:#8791AF;
+    --cyan:#0B3D91; --magenta:#C9A227; --violet:#8A6D1F;
+    --magenta-soft:rgba(201,162,39,.16); --violet-soft:rgba(201,162,39,.16); --cyan-soft:rgba(11,61,145,.10);
+    --blue-deep:#082C6B; --danger:#B23A26;
+    --success:#1E8A5F; --focus:#2F6FED;
+    --code-bg:#0F1A33; --code-text:#E8ECF5; --code-key:#E8C25B; --code-str:#7FCDA6; --code-com:#7C8AA8;
+    --wf-face:#F3F4F7; --wf-edge:#C7CCD4; --wf-ink:#22262B; --wf-soft:#6B7178; --wf-title:#E4E7EB;
+    box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  html{scroll-behavior:smooth; scroll-padding-top:78px;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; position:relative; overflow-x:hidden;
+  }
+  body::before{
+    content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(11,61,145,.07), transparent 42%),
+      radial-gradient(circle at 85% 0%, rgba(201,162,39,.10), transparent 40%),
+      radial-gradient(circle at 50% 100%, rgba(11,61,145,.05), transparent 45%),
+      radial-gradient(rgba(11,61,145,.10) 1px, transparent 1.4px) 0 0/28px 28px,
+      var(--bg);
+  }
+  #app{position:relative; z-index:1;}
+  h1,h2,h3,.brand-name,.eyebrow,.tag,.section-kicker{font-family:"Space Grotesk",system-ui,sans-serif;}
+  code,pre,.mono{font-family:"IBM Plex Mono",Consolas,monospace;}
+  a{color:inherit; text-decoration:none;}
+  button{font:inherit; cursor:pointer;}
+  ::selection{background:var(--cyan); color:#fff;}
+  :focus-visible{outline:2px solid var(--focus); outline-offset:2px;}
+
+  /* ---------- NAV ---------- */
+  header.nav{
+    position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between;
+    padding:calc(14px + env(safe-area-inset-top,0px)) 32px 14px; background:rgba(255,255,255,.86); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--edge);
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:38px; height:38px; border-radius:10px; flex:0 0 auto;
+    background:linear-gradient(135deg, var(--cyan), var(--magenta));
+    display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:16px;
+  }
+  .brand-name{font-size:15px; font-weight:700; color:var(--ink); line-height:1.2;}
+  .brand-sub{font-size:10.5px; letter-spacing:1.2px; color:var(--ink-dim); text-transform:uppercase;}
+  nav.links{display:flex; gap:4px;}
+  nav.links a{font-size:13.5px; color:var(--ink-soft); padding:8px 13px; border-radius:8px;}
+  nav.links a:hover{color:var(--blue-deep); background:rgba(11,61,145,.06);}
+  .menu-btn{display:none; border:1px solid var(--edge); background:var(--bg-panel); color:var(--ink); border-radius:8px; width:38px; height:38px; align-items:center; justify-content:center; font-size:16px;}
+  .mobile-nav{display:none;}
+
+  section{padding:80px 32px; position:relative;}
+  .wrap{max-width:1180px; margin:0 auto;}
+  .eyebrow{display:flex; align-items:center; gap:9px; font-size:12px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase; color:var(--cyan); margin-bottom:14px;}
+  .eyebrow::before{content:""; width:22px; height:2px; background:var(--cyan); display:inline-block;}
+  h2.section-title{font-size:34px; line-height:1.15; font-weight:700; margin:0 0 14px; max-width:16ch;}
+  .section-desc{font-size:15.5px; color:var(--ink-soft); line-height:1.65; max-width:60ch;}
+
+  /* ---------- HERO ---------- */
+  .hero{padding-top:64px; padding-bottom:70px;}
+  .hero-grid{display:grid; grid-template-columns:1.05fr .95fr; gap:56px; align-items:center;}
+  .hero h1{font-size:52px; line-height:1.08; font-weight:700; margin:0 0 20px;}
+  .hero h1 .glow{color:var(--magenta); text-shadow:0 0 22px rgba(201,162,39,.45), 0 0 46px rgba(201,162,39,.20);}
+  .hero p.lede{font-size:16px; color:var(--ink-soft); line-height:1.7; max-width:52ch; margin-bottom:28px;}
+  .cta-row{display:flex; gap:12px; flex-wrap:wrap;}
+  .btn{padding:13px 22px; border-radius:10px; font-size:14px; font-weight:600; border:1px solid transparent;}
+  .btn-primary{background:linear-gradient(120deg,var(--magenta),#E4C765); color:var(--blue-deep);}
+  .btn-ghost{background:transparent; border-color:var(--edge); color:var(--ink);}
+  .btn-ghost:hover{border-color:var(--cyan); color:var(--blue-deep);}
+
+  /* mini Windows-chrome mock window, reused everywhere */
+  .winbox{background:var(--wf-face); border:1px solid var(--wf-edge); border-radius:9px; overflow:hidden; box-shadow:0 30px 60px -30px rgba(0,0,0,.7);}
+  .winbox-title{display:flex; align-items:center; justify-content:space-between; background:var(--wf-title); padding:8px 12px; font-size:12px; color:var(--wf-soft); border-bottom:1px solid var(--wf-edge);}
+  .winbox-title .glyphs{display:flex; gap:10px; opacity:.6;}
+  .winbox-body{padding:22px 22px 20px; color:var(--wf-ink);}
+  .wf-field-label{font-size:12px; color:var(--wf-soft); margin-bottom:5px;}
+  .wf-input, .wf-select{width:100%; border:1px solid var(--wf-edge); border-radius:4px; padding:9px 11px; font-size:14px; color:var(--wf-ink); background:#fff; margin-bottom:16px;}
+  .wf-btn{background:linear-gradient(180deg,#fff,#ECEDEF); border:1px solid var(--wf-edge); border-radius:4px; padding:9px 16px; font-size:13.5px; color:var(--wf-ink); margin-right:8px;}
+  .wf-btn:hover{border-color:var(--magenta);}
+  .wf-note{display:flex; gap:8px; align-items:flex-start; font-size:12.5px; color:var(--wf-soft); border-left:3px solid var(--cyan); padding:8px 10px; background:#F5FBFB; border-radius:4px; margin-top:6px;}
+
+  /* ---------- CONCEPTS ---------- */
+  .concept-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:34px;}
+  .concept-card{background:var(--bg-card); border:1px solid var(--edge); border-radius:14px; padding:24px; position:relative; overflow:hidden;}
+  .concept-card::after{content:""; position:absolute; top:-40px; right:-40px; width:120px; height:120px; border-radius:50%; border:1px solid var(--edge); opacity:.5;}
+  .concept-num{font-size:12px; color:var(--cyan); font-weight:700; letter-spacing:1px; margin-bottom:10px;}
+  .concept-card h3{font-size:20px; margin:0 0 10px;}
+  .concept-card p{font-size:14px; color:var(--ink-soft); line-height:1.6; margin:0;}
+  .concept-card code{color:var(--violet); background:var(--violet-soft); padding:1px 6px; border-radius:4px; font-size:12.5px;}
+
+  /* ---------- CONTROLES ---------- */
+  .toolbar{display:flex; gap:12px; flex-wrap:wrap; margin:30px 0 26px;}
+  .toolbar input, .toolbar select{
+    background:var(--bg-card); border:1px solid var(--edge); color:var(--ink); border-radius:9px; padding:11px 14px; font-size:13.5px;
+  }
+  .toolbar input{flex:1; min-width:220px;}
+  .toolbar input::placeholder{color:var(--ink-dim);}
+  .ctrl-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+  .ctrl-card{background:var(--bg-card); border:1px solid var(--edge); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:10px; transition:border-color .15s ease;}
+  .ctrl-card:hover{border-color:var(--violet);}
+  .ctrl-card-head{display:flex; align-items:center; justify-content:space-between;}
+  .ctrl-card h4{margin:0; font-size:17px;}
+  .ctrl-tag{font-size:10.5px; font-weight:700; letter-spacing:.5px; color:var(--cyan); background:var(--cyan-soft); padding:3px 9px; border-radius:999px;}
+  .ctrl-card p{margin:0; font-size:13px; color:var(--ink-soft); line-height:1.55;}
+  .chip-row{display:flex; gap:6px; flex-wrap:wrap;}
+  .chip{font-size:11px; padding:3px 9px; border-radius:6px; background:rgba(11,61,145,.05); color:var(--ink-soft); border:1px solid var(--edge);}
+  .chip.ev{color:var(--magenta); border-color:var(--magenta-soft);}
+  .explore-link{margin-top:4px; font-size:13px; font-weight:600; color:var(--violet); display:inline-flex; align-items:center; gap:5px; background:none; border:none; padding:0; text-align:left;}
+  .explore-link:hover{color:var(--blue-deep);}
+  .no-results{color:var(--ink-dim); font-size:14px; padding:30px 4px;}
+
+  /* control detail panel */
+  .detail-panel{background:var(--bg-panel); border:1px solid var(--edge); border-radius:16px; padding:30px 32px; margin-top:22px; display:none;}
+  .detail-panel.open{display:block;}
+  .detail-back{font-size:13px; color:var(--ink-soft); background:none; border:none; margin-bottom:14px; display:inline-flex; gap:6px; align-items:center;}
+  .detail-back:hover{color:var(--blue-deep);}
+  .detail-head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+  .detail-head h3{font-size:26px; margin:0;}
+  .detail-tagline{color:var(--ink-soft); font-size:14.5px; margin:0 0 22px; max-width:62ch; line-height:1.6;}
+  .section-kicker{font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--cyan); margin:24px 0 10px;}
+  .cols2{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  .kv-list{margin:0; padding:0; list-style:none; font-size:13.5px;}
+  .kv-list li{padding:8px 0; border-bottom:1px dashed var(--edge); display:flex; gap:10px;}
+  .kv-list li:last-child{border-bottom:none;}
+  .kv-list code{background:var(--violet-soft); color:#D9CBFF; padding:1px 6px; border-radius:4px; font-size:12.5px; flex:0 0 auto; white-space:nowrap;}
+  .kv-list span{color:var(--ink-soft);}
+  .demo-row{display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  .demo-stack{display:flex; flex-direction:column; gap:12px;}
+  .demo-readout{font-size:13px; color:var(--wf-soft);}
+  .demo-readout b{color:var(--wf-ink);}
+  .wf-check-row, .wf-radio-row{display:flex; align-items:center; gap:8px; font-size:13.5px; margin-bottom:8px; color:var(--wf-ink);}
+  .wf-check-row input, .wf-radio-row input{accent-color:var(--magenta); width:15px; height:15px;}
+  .wf-listbox{border:1px solid var(--wf-edge); background:#fff; border-radius:4px; max-width:260px; overflow:hidden;}
+  .wf-listbox li{list-style:none; padding:7px 12px; font-size:13.5px; cursor:pointer; border-bottom:1px solid #EBEDEF; color:var(--wf-ink);}
+  .wf-listbox li:last-child{border-bottom:none;}
+  .wf-listbox li:hover{background:var(--magenta-soft);}
+  .wf-listbox li.sel{background:var(--cyan); color:#fff;}
+  .wf-picturebox{width:140px; height:100px; border:2px solid var(--wf-edge); background:#fff; display:flex; align-items:center; justify-content:center; overflow:hidden; border-radius:4px;}
+  .wf-progress-track{width:100%; max-width:300px; height:16px; background:#E7E9EC; border:1px solid var(--wf-edge); border-radius:4px; overflow:hidden;}
+  .wf-progress-fill{height:100%; width:0%; background:var(--magenta); transition:width .12s linear;}
+  .wf-timer-display{font-family:"IBM Plex Mono",monospace; font-size:26px; font-weight:600; color:var(--wf-ink); background:#fff; border:1px solid var(--wf-edge); border-radius:5px; padding:9px 16px; display:inline-block;}
+  .swatch{width:52px; height:52px; border-radius:8px; border:1px solid var(--wf-edge);}
+
+  .code-block{margin:14px 0 4px; border-radius:12px; overflow:hidden; border:1px solid var(--edge);}
+  .code-head{display:flex; align-items:center; justify-content:space-between; padding:9px 14px; font-size:12px; background:#080A16; color:var(--ink-dim);}
+  .copy-btn{border:1px solid var(--edge); background:transparent; color:var(--ink-soft); font-size:11.5px; padding:4px 10px; border-radius:7px;}
+  .copy-btn:hover{border-color:var(--cyan); color:var(--ink);}
+  pre.code{margin:0; background:var(--code-bg); color:var(--code-text); padding:16px 18px; overflow-x:auto; font-size:13.5px; line-height:1.6;}
+  .tok-key{color:var(--code-key);} .tok-str{color:var(--code-str);} .tok-com{color:var(--code-com); font-style:italic;}
+
+  /* ---------- EJEMPLO ---------- */
+  .example-grid{display:grid; grid-template-columns:.62fr 1.38fr; gap:36px; align-items:start; margin-top:30px;}
+  .mentor{display:flex; flex-direction:column; align-items:center; gap:16px;}
+  .mentor svg{width:180px; height:220px;}
+  .bubble{background:var(--bg-card); border:1px solid var(--edge); border-radius:14px; padding:16px 18px; font-size:13.5px; line-height:1.6; color:var(--ink-soft); position:relative;}
+  .bubble b{color:var(--cyan); display:block; font-size:12px; letter-spacing:.4px; text-transform:uppercase; margin-bottom:6px;}
+  .req-row{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px;}
+  .req-card{background:var(--bg-card); border:1px solid var(--edge); border-radius:10px; padding:13px 14px;}
+  .req-card b{font-size:12.5px; color:var(--violet); display:block; margin-bottom:4px;}
+  .req-card span{font-size:12px; color:var(--ink-soft); line-height:1.5;}
+  .example-split{display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start;}
+  .eps-tags{display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;}
+  .eps-tag{font-size:11.5px; padding:5px 11px; border-radius:999px; border:1px solid var(--edge); color:var(--ink-soft);}
+  .eps-tag.in{color:var(--cyan); border-color:var(--cyan-soft);}
+  .eps-tag.proc{color:var(--violet); border-color:var(--violet-soft);}
+  .eps-tag.out{color:var(--success); border-color:rgba(30,138,95,.25);}
+
+  /* ---------- LAB ---------- */
+  .lab-grid{display:grid; grid-template-columns:1fr 1fr; gap:30px; align-items:start; margin-top:28px;}
+  .lab-controls{display:flex; flex-direction:column; gap:16px;}
+  .lab-controls label{font-size:13px; color:var(--ink-soft); display:flex; flex-direction:column; gap:6px;}
+  .lab-controls select, .lab-controls input[type=range]{background:var(--bg-card); border:1px solid var(--edge); color:var(--ink); border-radius:8px; padding:9px 10px; font-size:13px;}
+  .lab-checklist{list-style:none; margin:20px 0 0; padding:0; display:flex; flex-direction:column; gap:9px;}
+  .lab-checklist li{display:flex; gap:9px; font-size:13.5px; color:var(--ink-soft); align-items:flex-start;}
+  .lab-checklist input{margin-top:3px; accent-color:var(--success);}
+
+  /* ---------- RETO ---------- */
+  .reto-card{background:var(--bg-card); border:1px solid var(--edge); border-radius:16px; padding:30px 32px; margin-top:28px;}
+  .reto-card h3{margin:0 0 10px; font-size:22px;}
+  .reto-card p{color:var(--ink-soft); line-height:1.65; font-size:14.5px;}
+  details.hint{margin-top:14px; border:1px solid var(--edge); border-radius:10px; padding:12px 16px; background:rgba(11,61,145,.04);}
+  details.hint summary{cursor:pointer; font-size:13.5px; font-weight:600; color:var(--violet);}
+  details.hint p{margin:10px 0 0;}
+  .rubric{list-style:none; margin:16px 0 0; padding:0; display:flex; flex-direction:column; gap:8px;}
+  .rubric li{display:flex; justify-content:space-between; font-size:13.5px; color:var(--ink-soft); border-bottom:1px dashed var(--edge); padding-bottom:8px;}
+  .rubric b{color:var(--ink);}
+
+  /* ---------- QUIZ ---------- */
+  .quiz-card{background:var(--bg-card); border:1px solid var(--edge); border-radius:16px; padding:30px 32px; margin-top:28px;}
+  .quiz-progress{font-size:12.5px; color:var(--ink-dim); margin-bottom:16px;}
+  .quiz-q{font-size:17px; font-weight:600; margin-bottom:16px;}
+  .quiz-opt{display:block; width:100%; text-align:left; background:var(--bg-panel); border:1px solid var(--edge); color:var(--ink); padding:12px 15px; border-radius:10px; margin-bottom:9px; font-size:14px;}
+  .quiz-opt:hover{border-color:var(--violet);}
+  .quiz-opt.correct{border-color:var(--success); background:rgba(30,138,95,.08); color:#155C40;}
+  .quiz-opt.wrong{border-color:var(--danger); background:rgba(178,58,38,.08); color:#7A2318;}
+  .quiz-explain{font-size:13.5px; color:var(--ink-soft); background:var(--bg-panel); border-left:3px solid var(--cyan); padding:12px 14px; border-radius:6px; margin-top:10px;}
+  .quiz-footer{display:flex; justify-content:space-between; align-items:center; margin-top:18px;}
+  .quiz-score{font-size:14px; color:var(--ink-soft);}
+
+  footer.site-footer{padding:40px 32px 60px; text-align:center; color:var(--ink-dim); font-size:12.5px; border-top:1px solid var(--edge); margin-top:20px;}
+
+  @media (max-width:980px){
+    nav.links{display:none;}
+    .menu-btn{display:flex;}
+    .mobile-nav.open{display:flex;}
+    .mobile-nav{position:fixed; inset:0 0 0 auto; width:78%; max-width:300px; background:var(--bg-panel); border-left:1px solid var(--edge); z-index:60; flex-direction:column; padding:70px 24px 24px; gap:6px;}
+    .mobile-nav a{font-size:15px; color:var(--ink-soft); padding:10px 4px;}
+    .mobile-overlay{position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:55; display:none;}
+    .mobile-overlay.open{display:block;}
+    .hero-grid, .example-grid, .lab-grid{grid-template-columns:1fr;}
+    .concept-grid, .req-row{grid-template-columns:1fr 1fr;}
+    .ctrl-grid{grid-template-columns:1fr 1fr;}
+    .cols2, .example-split{grid-template-columns:1fr;}
+    .hero h1{font-size:38px;}
+    section{padding:56px 18px;}
+  }
+  @media (max-width:620px){
+    .concept-grid, .req-row, .ctrl-grid{grid-template-columns:1fr;}
+    .hero h1{font-size:32px;}
+    header.nav{padding:14px 16px;}
+    .detail-panel{padding:22px 18px;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header class="nav">
+    <div class="brand">
+      <div class="brand-mark">MF</div>
+      <div>
+        <div class="brand-name">Dra. María Flores</div>
+        <div class="brand-sub">Laboratorio de C# · WinForms</div>
+      </div>
+    </div>
+    <nav class="links">
+      <a href="#inicio">Inicio</a>
+      <a href="#conceptos">Conceptos</a>
+      <a href="#controles">Controles</a>
+      <a href="#ejemplo">Ejemplo</a>
+      <a href="#laboratorio">Laboratorio</a>
+      <a href="#reto">Reto</a>
+      <a href="#quiz">Quiz</a>
+    </nav>
+    <button class="menu-btn" id="menu-btn">☰</button>
+  </header>
+  <div class="mobile-overlay" id="mobile-overlay"></div>
+  <nav class="mobile-nav" id="mobile-nav">
+    <a href="#inicio">Inicio</a>
+    <a href="#conceptos">Conceptos</a>
+    <a href="#controles">Controles</a>
+    <a href="#ejemplo">Ejemplo</a>
+    <a href="#laboratorio">Laboratorio</a>
+    <a href="#reto">Reto</a>
+    <a href="#quiz">Quiz</a>
+  </nav>
+
+  <section class="hero" id="inicio">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow">Fundamentos de programación</div>
+        <h1>De la consola a <span class="glow">Windows&nbsp;Forms</span></h1>
+        <p class="lede">Explora los controles visuales, reconoce sus propiedades y eventos, y arma una interfaz igual que en el diseñador de Visual Studio — todo desde este laboratorio interactivo.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#laboratorio">Abrir laboratorio</a>
+          <a class="btn btn-ghost" href="#controles">Ver controles</a>
+        </div>
+      </div>
+      <div class="winbox" id="hero-window">
+        <div class="winbox-title"><span>frmRegistro</span><span class="glyphs">— ▢ ×</span></div>
+        <div class="winbox-body">
+          <div class="wf-field-label">Nombre del estudiante</div>
+          <input class="wf-input" id="hero-nombre" value="Ana López">
+          <div class="wf-field-label">Lenguaje favorito</div>
+          <select class="wf-select" id="hero-lang">
+            <option>C#</option><option>Python</option><option>Java</option>
+          </select>
+          <button class="wf-btn" id="hero-registrar" type="button">Registrar</button>
+          <button class="wf-btn" id="hero-limpiar" type="button">Limpiar</button>
+          <div class="wf-note" id="hero-note">✓ Interfaz clara + controles adecuados + eventos programados.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="conceptos">
+    <div class="wrap">
+      <div class="eyebrow">Antes de arrastrar controles</div>
+      <h2 class="section-title">Las tres capas de una interfaz</h2>
+      <p class="section-desc">En Windows Forms no basta con que "se vea bonito": el control debe tener una identidad, una configuración y una respuesta.</p>
+      <div class="concept-grid">
+        <div class="concept-card">
+          <div class="concept-num">01 · CONTROL</div>
+          <h3>¿Qué es?</h3>
+          <p>Es el objeto visual que el usuario observa o utiliza: un <code>Button</code>, <code>TextBox</code>, <code>ListBox</code> y compañía.</p>
+        </div>
+        <div class="concept-card">
+          <div class="concept-num">02 · PROPIEDAD</div>
+          <h3>¿Cómo se comporta?</h3>
+          <p>Define su estado o apariencia. Ejemplos: <code>Name</code>, <code>Text</code>, <code>Enabled</code> y <code>BackColor</code>.</p>
+        </div>
+        <div class="concept-card">
+          <div class="concept-num">03 · EVENTO</div>
+          <h3>¿Cuándo actúa?</h3>
+          <p>Es una ocurrencia que dispara código: <code>Click</code>, <code>TextChanged</code> o <code>SelectedIndexChanged</code>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="controles">
+    <div class="wrap">
+      <div class="eyebrow">Cuadro de herramientas</div>
+      <h2 class="section-title">Explorador de controles</h2>
+      <p class="section-desc">Filtra por nombre, uso o propiedad, y selecciona una tarjeta para abrir el control en grande: cómo usarlo, sus propiedades, eventos y una demo en vivo.</p>
+      <div class="toolbar">
+        <input id="ctrl-search" type="text" placeholder="Ejemplo: capturar, Text o Click">
+        <select id="ctrl-filter">
+          <option value="Todos">Categoría: Todos</option>
+          <option value="Contenedor">Contenedor</option>
+          <option value="Entrada">Entrada</option>
+          <option value="Salida">Salida</option>
+          <option value="Acción">Acción</option>
+          <option value="Selección">Selección</option>
+          <option value="Multimedia">Multimedia</option>
+          <option value="Tiempo">Tiempo</option>
+        </select>
+      </div>
+      <div class="ctrl-grid" id="ctrl-grid"></div>
+      <div class="detail-panel" id="detail-panel"></div>
+    </div>
+  </section>
+
+  <section id="ejemplo">
+    <div class="wrap">
+      <div class="eyebrow">Aplicando el orden E · P · S</div>
+      <h2 class="section-title">¿Qué controles necesitamos?</h2>
+      <p class="section-desc">El usuario escribe una temperatura en grados Celsius. Al pulsar el botón, la aplicación aplica la fórmula de conversión y presenta el resultado en Fahrenheit.</p>
+
+      <div class="example-grid">
+        <div class="mentor">
+          <svg viewBox="0 0 120 150" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="60" cy="140" rx="34" ry="7" fill="#000" opacity=".18"/>
+            <rect x="34" y="60" width="52" height="62" rx="14" fill="#0B3D91"/>
+            <rect x="40" y="66" width="40" height="30" rx="6" fill="#C9A227" opacity=".9"/>
+            <circle cx="60" cy="34" r="26" fill="#F3D9C9"/>
+            <path d="M34 30 a26 22 0 0 1 52 0 v4 h-52 z" fill="#16233F"/>
+            <circle cx="50" cy="35" r="3.2" fill="#16233F"/>
+            <circle cx="70" cy="35" r="3.2" fill="#16233F"/>
+            <path d="M50 46 q10 7 20 0" stroke="#16233F" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <rect x="10" y="70" width="16" height="40" rx="8" fill="#C9A227"/>
+            <rect x="94" y="70" width="16" height="40" rx="8" fill="#C9A227"/>
+          </svg>
+          <div class="bubble">
+            <b>Bitácora · Dra. Flores</b>
+            Primero defines qué necesitas capturar, luego qué operación aplicas, y al final dónde muestras el resultado. Ese orden — Entrada, Proceso, Salida — hace que cualquier interfaz sea más fácil de programar.
+          </div>
+        </div>
+
+        <div>
+          <div class="req-row">
+            <div class="req-card"><b>Form · frmConversor</b><span>Contiene toda la interfaz.</span></div>
+            <div class="req-card"><b>Label · lblResultado</b><span>Muestra el resultado en Fahrenheit.</span></div>
+            <div class="req-card"><b>TextBox · txtCelsius</b><span>Recibe la temperatura en grados Celsius.</span></div>
+            <div class="req-card"><b>Button · btnConvertir</b><span>Ejecuta el cálculo en Click.</span></div>
+          </div>
+
+          <div class="example-split">
+            <div class="winbox">
+              <div class="winbox-title"><span>frmConversor</span><span class="glyphs">— ▢ ×</span></div>
+              <div class="winbox-body">
+                <div class="wf-field-label">Temperatura en Celsius:</div>
+                <input class="wf-input" id="ej-celsius" value="20">
+                <button class="wf-btn" id="ej-convertir" type="button" style="width:100%; margin:2px 0 16px;">CONVERTIR A FAHRENHEIT</button>
+                <div class="wf-note" id="ej-resultado" style="border-left-color:var(--magenta); font-size:14px; font-weight:600;">Fahrenheit: 68.0°</div>
+              </div>
+            </div>
+            <div class="code-block" style="margin:0;">
+              <div class="code-head"><span>frmConversor.cs · evento Click</span><button class="copy-btn" id="ej-copy">Copiar</button></div>
+              <pre class="code"><code id="ej-code"></code></pre>
+            </div>
+          </div>
+          <div class="eps-tags">
+            <span class="eps-tag in">Entrada · TextBox.Text</span>
+            <span class="eps-tag proc">Proceso · Fórmula °F = °C × 9/5 + 32</span>
+            <span class="eps-tag out">Salida · Label.Text</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="laboratorio">
+    <div class="wrap">
+      <div class="eyebrow">Práctica guiada</div>
+      <h2 class="section-title">Laboratorio: personaliza el formulario</h2>
+      <p class="section-desc">Cambia las propiedades desde los controles de la izquierda y observa en vivo cómo reacciona la ventana — así se siente ajustar propiedades desde el panel de Visual Studio.</p>
+      <div class="lab-grid">
+        <div>
+          <div class="lab-controls">
+            <label>Text del formulario
+              <input type="text" id="lab-title" value="Panel de bienvenida">
+            </label>
+            <label>BackColor de la ventana
+              <select id="lab-color">
+                <option value="#F3F4F7">Gris claro (predeterminado)</option>
+                <option value="#EAF6F6">Cian suave</option>
+                <option value="#FBEFF2">Rosa suave</option>
+                <option value="#F1EEFB">Violeta suave</option>
+              </select>
+            </label>
+            <label>Font size del mensaje: <span id="lab-size-val">14</span>px
+              <input type="range" min="12" max="26" value="14" id="lab-size">
+            </label>
+            <label><input type="checkbox" id="lab-bold" style="width:auto; margin-right:6px;"> Bold del mensaje</label>
+          </div>
+          <ul class="lab-checklist">
+            <li><input type="checkbox"> El formulario tiene un <code>Text</code> descriptivo, no "Form1".</li>
+            <li><input type="checkbox"> Los colores tienen buen contraste con el texto.</li>
+            <li><input type="checkbox"> El tamaño de fuente es legible desde el fondo del salón.</li>
+          </ul>
+        </div>
+        <div class="winbox">
+          <div class="winbox-title"><span id="lab-title-echo">Panel de bienvenida</span><span class="glyphs">— ▢ ×</span></div>
+          <div class="winbox-body" id="lab-window-body">
+            <p id="lab-message" style="font-size:14px; margin:0;">¡Bienvenidos al laboratorio de Windows Forms!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="reto">
+    <div class="wrap">
+      <div class="eyebrow">Ponlo en práctica</div>
+      <h2 class="section-title">Reto de la semana</h2>
+      <div class="reto-card">
+        <h3>Calculadora de propina</h3>
+        <p>Construye un formulario donde el usuario escriba el total de la cuenta y elija un porcentaje de propina en un <code>ComboBox</code> (10%, 15%, 20%). Al presionar "Calcular", debe mostrarse cuánto pagar de propina y el total final.</p>
+        <details class="hint"><summary>Pista 1 — ¿qué controles necesito?</summary><p>Un <code>TextBox</code> para el total, un <code>ComboBox</code> para el porcentaje, un <code>Button</code> para calcular y dos <code>Label</code> para mostrar los resultados.</p></details>
+        <details class="hint"><summary>Pista 2 — la fórmula</summary><p><code>propina = total * (porcentaje / 100.0)</code> y <code>totalFinal = total + propina</code>.</p></details>
+        <ul class="rubric">
+          <li>Interfaz completa y ordenada <b>25%</b></li>
+          <li>Conversión correcta de datos (TryParse) <b>25%</b></li>
+          <li>Cálculo correcto de propina y total <b>30%</b></li>
+          <li>Manejo de datos vacíos o inválidos <b>20%</b></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="quiz">
+    <div class="wrap">
+      <div class="eyebrow">Autoevaluación</div>
+      <h2 class="section-title">Quiz relámpago</h2>
+      <div class="quiz-card" id="quiz-card"></div>
+    </div>
+  </section>
+
+  <footer class="site-footer">Material del Laboratorio de C# · Dra. María Flores</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- utilities shared across sections ---------- */
+  function escapeHtml(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function highlight(code){
+    var esc = escapeHtml(code);
+    var strings = [];
+    esc = esc.replace(/\$?"(?:[^"\\]|\\.)*"/g, function(m){ strings.push(m); return "\u0000"+(strings.length-1)+"\u0000"; });
+    var comments = [];
+    esc = esc.replace(/\/\/.*$/gm, function(m){ comments.push(m); return "\u0001"+(comments.length-1)+"\u0001"; });
+    var kw = ["public","private","protected","internal","class","static","void","new","using","namespace",
+      "if","else","for","foreach","while","return","this","string","int","bool","double","float","var",
+      "true","false","null","try","catch","finally","out","get","set","event","object","List"];
+    esc = esc.replace(new RegExp("\\b("+kw.join("|")+")\\b","g"), '<span class="tok-key">$1</span>');
+    esc = esc.replace(/\u0000(\d+)\u0000/g, function(_,i){ return '<span class="tok-str">'+strings[+i]+'</span>'; });
+    esc = esc.replace(/\u0001(\d+)\u0001/g, function(_,i){ return '<span class="tok-com">'+comments[+i]+'</span>'; });
+    return esc;
+  }
+  function winbox(bodyHtml){
+    return '<div class="winbox">' +
+      '<div class="winbox-title"><span>Form1</span><span class="glyphs">— ▢ ×</span></div>' +
+      '<div class="winbox-body" style="background:#fff;">'+bodyHtml+'</div>' +
+    '</div>';
+  }
+  function copyText(text, btn){
+    try{
+      navigator.clipboard.writeText(text).then(function(){
+        var old = btn.textContent; btn.textContent = "¡Copiado!";
+        setTimeout(function(){ btn.textContent = old; }, 1300);
+      });
+    }catch(e){}
+  }
+
+  /* ---------- mobile nav ---------- */
+  var menuBtn = document.getElementById("menu-btn");
+  var mobileNav = document.getElementById("mobile-nav");
+  var overlay = document.getElementById("mobile-overlay");
+  function closeMobile(){ mobileNav.classList.remove("open"); overlay.classList.remove("open"); }
+  menuBtn.addEventListener("click", function(){ mobileNav.classList.toggle("open"); overlay.classList.toggle("open"); });
+  overlay.addEventListener("click", closeMobile);
+  Array.prototype.forEach.call(mobileNav.querySelectorAll("a"), function(a){ a.addEventListener("click", closeMobile); });
+
+  /* ---------- HERO interactive mock ---------- */
+  document.getElementById("hero-registrar").addEventListener("click", function(){
+    var n = document.getElementById("hero-nombre").value.trim();
+    var l = document.getElementById("hero-lang").value;
+    var note = document.getElementById("hero-note");
+    note.textContent = n ? ("✓ Registrado: " + n + " · " + l) : "⚠ Escribe un nombre antes de registrar.";
+  });
+  document.getElementById("hero-limpiar").addEventListener("click", function(){
+    document.getElementById("hero-nombre").value = "";
+    document.getElementById("hero-note").textContent = "✓ Interfaz clara + controles adecuados + eventos programados.";
+  });
+
+  /* ---------- CONTROLES: data ---------- */
+  var timers = {};
+  function clearTimers(){ Object.keys(timers).forEach(function(k){ clearInterval(timers[k]); }); timers = {}; }
+
+  var CONTROLS = [
+    {id:"form", tag:"frm", cat:"Contenedor", title:"Form", blurb:"Contenedor principal donde se diseña la interfaz de la aplicación.",
+      chips:["Name","Text","StartPosition"], ev:"Load",
+      props:[["Name","cómo se referencia el formulario en el código"],["Text","el título de la ventana"],["StartPosition","dónde aparece al abrir (CenterScreen es lo más usado)"]],
+      events:[["Load","se dispara cuando el formulario existe pero aún no es visible"]],
+      code:'private void Form1_Load(object sender, EventArgs e)\n{\n    this.Text = "Mi primera ventana";\n    this.StartPosition = FormStartPosition.CenterScreen;\n}',
+      demo:{
+        render:function(){ return winbox('<div class="demo-row"><button class="wf-btn" data-c="#F3F4F7">Gris</button><button class="wf-btn" data-c="#EAF6F6">Cian</button><button class="wf-btn" data-c="#FBEFF2">Rosa</button><div class="demo-readout">Cambia el <b>BackColor</b> de la ventana</div></div>'); },
+        attach:function(){
+          var wb = document.querySelector("#detail-panel .winbox-body");
+          Array.prototype.forEach.call(document.querySelectorAll("[data-c]"), function(b){
+            b.addEventListener("click", function(){ wb.style.background = b.getAttribute("data-c"); });
+          });
+        }
+      }
+    },
+    {id:"label", tag:"lbl", cat:"Salida", title:"Label", blurb:"Muestra texto informativo que normalmente el usuario no modifica.",
+      chips:["Text","Font","ForeColor"], ev:"Click",
+      props:[["Text","el texto que muestra"],["Font","tipografía, tamaño y estilo"],["ForeColor","color del texto"],["AutoSize","si el control crece según el texto"]],
+      events:[["Click","poco común, pero existe si se necesita hacer el texto clicable"]],
+      code:'private void ActualizarMensaje()\n{\n    lblMensaje.Text = "¡Operación completada!";\n    lblMensaje.ForeColor = Color.SeaGreen;\n}',
+      demo:{
+        render:function(){ return winbox('<div class="demo-stack"><div id="d-lbl" style="font-size:16px; color:#22262B;">¡Operación completada!</div><div class="demo-row"><input type="range" min="12" max="28" value="16" id="d-lbl-size"><button class="wf-btn" data-c="#3E8C61">Verde</button><button class="wf-btn" data-c="#C24A17">Naranja</button></div></div>'); },
+        attach:function(){
+          var lbl = document.getElementById("d-lbl");
+          document.getElementById("d-lbl-size").addEventListener("input", function(e){ lbl.style.fontSize = e.target.value+"px"; });
+          Array.prototype.forEach.call(document.querySelectorAll("[data-c]"), function(b){ b.addEventListener("click", function(){ lbl.style.color = b.getAttribute("data-c"); }); });
+        }
+      }
+    },
+    {id:"textbox", tag:"txt", cat:"Entrada", title:"TextBox", blurb:"Permite al usuario escribir o editar texto libremente.",
+      chips:["Text","MaxLength","Multiline"], ev:"TextChanged",
+      props:[["Text","el contenido actual"],["MaxLength","cantidad máxima de caracteres"],["Multiline","si acepta varias líneas"],["PasswordChar","oculta el texto (contraseñas)"]],
+      events:[["TextChanged","cada vez que cambia el contenido"],["KeyPress","al presionar una tecla"]],
+      code:'private void txtNombre_TextChanged(object sender, EventArgs e)\n{\n    lblContador.Text = $"Caracteres: {txtNombre.Text.Length}";\n}',
+      demo:{
+        render:function(){ return winbox('<div class="demo-stack"><input class="wf-input" id="d-txt" placeholder="Escribe tu nombre..." style="margin-bottom:0;"><div class="demo-readout">Caracteres: <b id="d-txt-count">0</b></div></div>'); },
+        attach:function(){ document.getElementById("d-txt").addEventListener("input", function(e){ document.getElementById("d-txt-count").textContent = e.target.value.length; }); }
+      }
+    },
+    {id:"combobox", tag:"cmb", cat:"Selección", title:"ComboBox", blurb:"Lista desplegable para elegir una opción entre varias.",
+      chips:["Items","SelectedIndex","DropDownStyle"], ev:"SelectedIndexChanged",
+      props:[["Items","la colección de opciones"],["SelectedIndex","posición de la opción elegida"],["DropDownStyle","si se puede escribir texto libre o no"]],
+      events:[["SelectedIndexChanged","cuando el usuario elige otra opción"]],
+      code:'private void comboColor_SelectedIndexChanged(object sender, EventArgs e)\n{\n    panelVista.BackColor = Color.FromName(comboColor.SelectedItem.ToString());\n}',
+      demo:{
+        render:function(){ return winbox('<div class="demo-row"><select class="wf-select" id="d-cmb" style="margin-bottom:0; width:auto;"><option value="#C24A17">Naranja</option><option value="#3E8C61">Verde</option><option value="#2F6FED">Azul</option></select><div class="swatch" id="d-cmb-swatch" style="background:#C24A17;"></div></div>'); },
+        attach:function(){ var s=document.getElementById("d-cmb"), sw=document.getElementById("d-cmb-swatch"); s.addEventListener("change", function(){ sw.style.background=s.value; }); }
+      }
+    },
+    {id:"checkbox", tag:"chk", cat:"Selección", title:"CheckBox", blurb:"Casilla independiente: se puede marcar más de una a la vez.",
+      chips:["Checked","Text","ThreeState"], ev:"CheckedChanged",
+      props:[["Checked","si está marcada"],["Text","la etiqueta junto a la casilla"],["ThreeState","permite un estado indeterminado"]],
+      events:[["CheckedChanged","al marcar o desmarcar"]],
+      code:'if (chkProgramacion.Checked) seleccion.Add("Programación");\nif (chkDiseno.Checked) seleccion.Add("Diseño");',
+      demo:{
+        render:function(){ return winbox('<div class="demo-stack"><label class="wf-check-row"><input type="checkbox" id="d-c1"> Programación</label><label class="wf-check-row"><input type="checkbox" id="d-c2"> Diseño</label><div class="demo-readout">Intereses: <b id="d-c-out">ninguno</b></div></div>'); },
+        attach:function(){
+          var boxes=[["d-c1","Programación"],["d-c2","Diseño"]];
+          function upd(){ var sel=boxes.filter(function(b){return document.getElementById(b[0]).checked;}).map(function(b){return b[1];}); document.getElementById("d-c-out").textContent = sel.length?sel.join(", "):"ninguno"; }
+          boxes.forEach(function(b){ document.getElementById(b[0]).addEventListener("change", upd); });
+        }
+      }
+    },
+    {id:"radiobutton", tag:"rad", cat:"Selección", title:"RadioButton", blurb:"Opción mutuamente excluyente — funciona en grupo dentro de un GroupBox o Panel.",
+      chips:["Checked","Text"], ev:"CheckedChanged",
+      props:[["Checked","si está seleccionado"],["Text","la etiqueta de la opción"]],
+      events:[["CheckedChanged","cuando cambia la selección del grupo"]],
+      code:'if (radioNaranja.Checked) panelVista.BackColor = Color.OrangeRed;\nelse if (radioAzul.Checked) panelVista.BackColor = Color.SteelBlue;',
+      demo:{
+        render:function(){ return winbox('<div class="demo-row"><div class="demo-stack" style="gap:6px;"><label class="wf-radio-row"><input type="radio" name="d-r" id="d-r1" checked> Naranja</label><label class="wf-radio-row"><input type="radio" name="d-r" id="d-r2"> Azul</label></div><div class="swatch" id="d-r-swatch" style="background:#C24A17;"></div></div>'); },
+        attach:function(){ var map={"d-r1":"#C24A17","d-r2":"#2F6FED"}; var sw=document.getElementById("d-r-swatch"); Object.keys(map).forEach(function(id){ document.getElementById(id).addEventListener("change", function(){ sw.style.background=map[id]; }); }); }
+      }
+    },
+    {id:"listbox", tag:"lst", cat:"Selección", title:"ListBox", blurb:"Lista siempre visible, con selección única o múltiple.",
+      chips:["Items","SelectedItems","SelectionMode"], ev:"SelectedIndexChanged",
+      props:[["Items","la colección de elementos"],["SelectedItems","los elementos seleccionados"],["SelectionMode","única, múltiple simple o extendida"]],
+      events:[["SelectedIndexChanged","cuando cambia la selección"]],
+      code:'var seleccionados = listaDias.SelectedItems.Cast<string>();\nlblSeleccion.Text = "Elegidos: " + string.Join(", ", seleccionados);',
+      demo:{
+        render:function(){
+          var items=["Lunes","Martes","Miércoles"];
+          var lis = items.map(function(it){ return '<li data-item="'+it+'">'+it+'</li>'; }).join("");
+          return winbox('<div class="demo-row" style="align-items:flex-start;"><ul class="wf-listbox" id="d-lst">'+lis+'</ul><div class="demo-readout">Elegidos: <b id="d-lst-out">ninguno</b></div></div>');
+        },
+        attach:function(){
+          var out=document.getElementById("d-lst-out");
+          Array.prototype.forEach.call(document.querySelectorAll("#d-lst li"), function(li){
+            li.addEventListener("click", function(){
+              li.classList.toggle("sel");
+              var sel = Array.prototype.filter.call(document.querySelectorAll("#d-lst li"), function(l){return l.classList.contains("sel");}).map(function(l){return l.getAttribute("data-item");});
+              out.textContent = sel.length? sel.join(", "):"ninguno";
+            });
+          });
+        }
+      }
+    },
+    {id:"picturebox", tag:"pic", cat:"Multimedia", title:"PictureBox", blurb:"Muestra una imagen dentro del formulario, ajustable al espacio disponible.",
+      chips:["Image","SizeMode","BorderStyle"], ev:"Click",
+      props:[["Image","la imagen que muestra"],["SizeMode","Normal, Stretch, Zoom, CenterImage"],["BorderStyle","si tiene borde visible"]],
+      events:[["Click","al hacer clic sobre la imagen"]],
+      code:'pictureBox1.Image = Image.FromFile("logo.png");\npictureBox1.SizeMode = PictureBoxSizeMode.Zoom;',
+      demo:{
+        render:function(){
+          var svg = '<svg width="70" height="52" viewBox="0 0 80 60"><rect width="80" height="60" fill="#E7E9EC"/><circle cx="20" cy="16" r="7" fill="#C24A17"/><path d="M0 46L26 26L46 42L58 30L80 50V60H0V46Z" fill="#9AA3BE" opacity="0.6"/></svg>';
+          return winbox('<div class="demo-row"><div class="wf-picturebox" id="d-pic">'+svg+'</div><div class="demo-stack" style="gap:6px;"><button class="wf-btn" data-m="n">Normal</button><button class="wf-btn" data-m="z">Zoom</button></div></div>');
+        },
+        attach:function(){
+          var svg = document.querySelector("#d-pic svg");
+          Array.prototype.forEach.call(document.querySelectorAll("[data-m]"), function(b){
+            b.addEventListener("click", function(){ svg.style.transform = b.getAttribute("data-m")==="z" ? "scale(1.6)" : "none"; });
+          });
+        }
+      }
+    },
+    {id:"progressbar", tag:"prg", cat:"Tiempo", title:"ProgressBar", blurb:"Barra visual que indica el avance de una tarea.",
+      chips:["Minimum","Maximum","Value"], ev:"(vía Timer)",
+      props:[["Minimum / Maximum","rango de valores posibles"],["Value","progreso actual"],["Style","Continuo, Blocks o Marquee"]],
+      events:[["—","no tiene evento propio; se actualiza desde un Timer o un bucle"]],
+      code:'private void timerProceso_Tick(object sender, EventArgs e)\n{\n    if (progressBar1.Value < progressBar1.Maximum)\n        progressBar1.Value += 5;\n    else\n        timerProceso.Stop();\n}',
+      demo:{
+        render:function(){ return winbox('<div class="demo-stack"><div class="wf-progress-track"><div class="wf-progress-fill" id="d-pf"></div></div><div class="demo-row"><button class="wf-btn" id="d-p-start">Iniciar</button><button class="wf-btn" id="d-p-reset">Reiniciar</button><span class="demo-readout" id="d-p-out">0%</span></div></div>'); },
+        attach:function(){
+          var fill=document.getElementById("d-pf"), out=document.getElementById("d-p-out"), val=0;
+          function setVal(v){ val=v; fill.style.width=v+"%"; out.textContent=v+"%"; }
+          document.getElementById("d-p-start").addEventListener("click", function(){
+            clearInterval(timers.prog);
+            timers.prog = setInterval(function(){ if(val>=100){clearInterval(timers.prog);return;} setVal(Math.min(100,val+5)); }, 110);
+          });
+          document.getElementById("d-p-reset").addEventListener("click", function(){ clearInterval(timers.prog); setVal(0); });
+        }
+      }
+    },
+    {id:"timer", tag:"tmr", cat:"Tiempo", title:"Timer", blurb:"Ejecuta código automáticamente cada cierto intervalo.",
+      chips:["Interval","Enabled"], ev:"Tick",
+      props:[["Interval","milisegundos entre cada Tick"],["Enabled","si está corriendo"]],
+      events:[["Tick","se dispara cada Interval milisegundos"]],
+      code:'private void timer1_Tick(object sender, EventArgs e)\n{\n    segundos++;\n    lblCronometro.Text = $"{segundos} s";\n}',
+      demo:{
+        render:function(){ return winbox('<div class="demo-stack"><div class="wf-timer-display" id="d-t-out">0 s</div><div class="demo-row"><button class="wf-btn" id="d-t-start">Iniciar</button><button class="wf-btn" id="d-t-reset">Reiniciar</button></div></div>'); },
+        attach:function(){
+          var out=document.getElementById("d-t-out"), s=0;
+          document.getElementById("d-t-start").addEventListener("click", function(){ clearInterval(timers.tmr); timers.tmr=setInterval(function(){ s++; out.textContent=s+" s"; },1000); });
+          document.getElementById("d-t-reset").addEventListener("click", function(){ clearInterval(timers.tmr); s=0; out.textContent="0 s"; });
+        }
+      }
+    }
+  ];
+
+  function ctrlCardHtml(c){
+    var chips = c.chips.map(function(p){ return '<span class="chip">'+p+'</span>'; }).join("");
+    return '<div class="ctrl-card">' +
+      '<div class="ctrl-card-head"><h4>'+c.title+'</h4><span class="ctrl-tag">'+c.tag+'</span></div>' +
+      '<p>'+c.blurb+'</p>' +
+      '<div class="chip-row">'+chips+'<span class="chip ev">⚡ '+c.ev+'</span></div>' +
+      '<button class="explore-link" data-open="'+c.id+'">✦ Explora este control</button>' +
+    '</div>';
+  }
+
+  function renderGrid(){
+    var q = document.getElementById("ctrl-search").value.trim().toLowerCase();
+    var cat = document.getElementById("ctrl-filter").value;
+    var grid = document.getElementById("ctrl-grid");
+    var filtered = CONTROLS.filter(function(c){
+      var matchesCat = (cat === "Todos") || (c.cat === cat);
+      var haystack = (c.title+" "+c.blurb+" "+c.chips.join(" ")+" "+c.ev).toLowerCase();
+      var matchesQ = q === "" || haystack.indexOf(q) !== -1;
+      return matchesCat && matchesQ;
+    });
+    grid.innerHTML = filtered.length ? filtered.map(ctrlCardHtml).join("") : '<div class="no-results">No hay controles que coincidan con tu búsqueda.</div>';
+    Array.prototype.forEach.call(grid.querySelectorAll("[data-open]"), function(btn){
+      btn.addEventListener("click", function(){ openDetail(btn.getAttribute("data-open")); });
+    });
+  }
+  document.getElementById("ctrl-search").addEventListener("input", renderGrid);
+  document.getElementById("ctrl-filter").addEventListener("change", renderGrid);
+
+  function openDetail(id){
+    clearTimers();
+    var c = CONTROLS.filter(function(cc){ return cc.id === id; })[0];
+    if(!c) return;
+    var panel = document.getElementById("detail-panel");
+    var propsHtml = c.props.map(function(p){ return '<li><code>'+p[0]+'</code><span>'+p[1]+'</span></li>'; }).join("");
+    var eventsHtml = c.events.map(function(p){ return '<li><code>'+p[0]+'</code><span>'+p[1]+'</span></li>'; }).join("");
+    panel.innerHTML =
+      '<button class="detail-back" id="detail-back">← Volver al explorador</button>' +
+      '<div class="detail-head"><span class="ctrl-tag">'+c.tag+'</span><h3>'+c.title+'</h3></div>' +
+      '<p class="detail-tagline">'+c.blurb+'</p>' +
+      '<div class="section-kicker">Demo interactiva</div>' + c.demo.render() +
+      '<div class="cols2">' +
+        '<div><div class="section-kicker">Propiedades</div><ul class="kv-list">'+propsHtml+'</ul></div>' +
+        '<div><div class="section-kicker">Eventos</div><ul class="kv-list">'+eventsHtml+'</ul></div>' +
+      '</div>' +
+      '<div class="section-kicker">Código de ejemplo</div>' +
+      '<div class="code-block"><div class="code-head"><span>Form1.cs</span><button class="copy-btn" id="detail-copy">Copiar</button></div>' +
+      '<pre class="code"><code>'+highlight(c.code)+'</code></pre></div>';
+    panel.classList.add("open");
+    c.demo.attach();
+    document.getElementById("detail-back").addEventListener("click", function(){ panel.classList.remove("open"); clearTimers(); });
+    document.getElementById("detail-copy").addEventListener("click", function(){ copyText(c.code, document.getElementById("detail-copy")); });
+    panel.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+  renderGrid();
+
+  /* ---------- EJEMPLO: temperature converter ---------- */
+  var ejCode = 'private void btnConvertir_Click(object sender, EventArgs e)\n{\n    // ENTRADA: leer el TextBox\n    double celsius = double.Parse(txtCelsius.Text);\n\n    // PROCESO: aplicar la fórmula\n    double fahrenheit = celsius * 9.0 / 5.0 + 32;\n\n    // SALIDA: modificar el Text del Label\n    lblResultado.Text = "Fahrenheit: " + fahrenheit.ToString("N1") + "°";\n}';
+  document.getElementById("ej-code").innerHTML = highlight(ejCode);
+  document.getElementById("ej-copy").addEventListener("click", function(){ copyText(ejCode, document.getElementById("ej-copy")); });
+  document.getElementById("ej-convertir").addEventListener("click", function(){
+    var c = parseFloat(document.getElementById("ej-celsius").value);
+    var out = document.getElementById("ej-resultado");
+    if(isNaN(c)){ out.textContent = "Escribe un número válido."; return; }
+    var f = (c * 9/5 + 32).toFixed(1);
+    out.textContent = "Fahrenheit: " + f + "°";
+  });
+
+  /* ---------- LABORATORIO ---------- */
+  var labTitle = document.getElementById("lab-title");
+  var labTitleEcho = document.getElementById("lab-title-echo");
+  var labColor = document.getElementById("lab-color");
+  var labBody = document.getElementById("lab-window-body");
+  var labSize = document.getElementById("lab-size");
+  var labSizeVal = document.getElementById("lab-size-val");
+  var labBold = document.getElementById("lab-bold");
+  var labMsg = document.getElementById("lab-message");
+  labTitle.addEventListener("input", function(){ labTitleEcho.textContent = labTitle.value || "Form1"; });
+  labColor.addEventListener("change", function(){ labBody.style.background = labColor.value; });
+  labSize.addEventListener("input", function(){ labSizeVal.textContent = labSize.value; labMsg.style.fontSize = labSize.value+"px"; });
+  labBold.addEventListener("change", function(){ labMsg.style.fontWeight = labBold.checked ? "700" : "400"; });
+
+  /* ---------- QUIZ ---------- */
+  var QUIZ = [
+    {q:"¿Qué propiedad cambia el título de una ventana?", opts:["Name","Text","StartPosition"], correct:1, why:"Text define lo que se muestra; Name es solo el identificador interno del control."},
+    {q:"¿Cuál control es el correcto para que el usuario elija UNA opción entre varias, mutuamente excluyentes?", opts:["CheckBox","RadioButton","ListBox"], correct:1, why:"RadioButton agrupa opciones excluyentes; CheckBox permite marcar varias a la vez."},
+    {q:"¿Qué evento se dispara cada vez que el usuario escribe en un TextBox?", opts:["Click","TextChanged","Load"], correct:1, why:"TextChanged se dispara con cada cambio en el contenido del cuadro de texto."},
+    {q:"Para que varios RadioButton funcionen como un solo grupo, ¿qué se necesita?", opts:["Nada especial","Agruparlos en un GroupBox o Panel","Ponerles el mismo Name"], correct:1, why:"Sin un contenedor que los agrupe, todos los RadioButton del formulario se excluyen entre sí."},
+    {q:"¿Qué control ejecuta código automáticamente cada cierto intervalo, sin acción del usuario?", opts:["ProgressBar","Timer","PictureBox"], correct:1, why:"Timer dispara su evento Tick cada Interval milisegundos, útil para relojes o animaciones simples."}
+  ];
+  var qIndex = 0, qScore = 0, qAnswered = false;
+
+  function renderQuiz(){
+    var card = document.getElementById("quiz-card");
+    if(qIndex >= QUIZ.length){
+      card.innerHTML = '<div class="quiz-q">¡Quiz terminado!</div>' +
+        '<p class="quiz-score">Puntaje: '+qScore+' de '+QUIZ.length+'</p>' +
+        '<button class="btn btn-primary" id="quiz-restart" type="button">Reiniciar quiz</button>';
+      document.getElementById("quiz-restart").addEventListener("click", function(){ qIndex=0; qScore=0; renderQuiz(); });
+      return;
+    }
+    var item = QUIZ[qIndex];
+    qAnswered = false;
+    var optsHtml = item.opts.map(function(o,i){ return '<button class="quiz-opt" data-i="'+i+'">'+o+'</button>'; }).join("");
+    card.innerHTML =
+      '<div class="quiz-progress">Pregunta '+(qIndex+1)+' de '+QUIZ.length+'</div>' +
+      '<div class="quiz-q">'+item.q+'</div>' +
+      optsHtml +
+      '<div id="quiz-explain-slot"></div>' +
+      '<div class="quiz-footer"><span class="quiz-score">Aciertos: '+qScore+'</span><button class="btn btn-ghost" id="quiz-next" type="button" disabled>Siguiente →</button></div>';
+
+    Array.prototype.forEach.call(card.querySelectorAll(".quiz-opt"), function(btn){
+      btn.addEventListener("click", function(){
+        if(qAnswered) return;
+        qAnswered = true;
+        var i = parseInt(btn.getAttribute("data-i"),10);
+        Array.prototype.forEach.call(card.querySelectorAll(".quiz-opt"), function(b, bi){
+          if(bi === item.correct) b.classList.add("correct");
+          else if(bi === i) b.classList.add("wrong");
+        });
+        if(i === item.correct) qScore++;
+        document.getElementById("quiz-explain-slot").innerHTML = '<div class="quiz-explain">'+item.why+'</div>';
+        document.getElementById("quiz-next").disabled = false;
+      });
+    });
+    document.getElementById("quiz-next").addEventListener("click", function(){ qIndex++; renderQuiz(); });
+  }
+  renderQuiz();
+
+})();
+</script>
+</body>
+</html>
